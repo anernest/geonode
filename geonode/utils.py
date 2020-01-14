@@ -211,7 +211,7 @@ def get_headers(request, url, raw_url, allowed_hosts=[]):
     csrftoken = None
 
     if settings.SESSION_COOKIE_NAME in request.COOKIES and is_safe_url(
-            url=raw_url, host=url.hostname):
+            url=raw_url, allowed_hosts=url.hostname):
         cookies = request.META["HTTP_COOKIE"]
 
     for cook in request.COOKIES:
@@ -1456,7 +1456,7 @@ class HttpClient(object):
                     pass
             elif user == self.username:
                 valid_uname_pw = base64.b64encode(
-                    b"%s:%s" % (self.username, self.password)).decode("ascii")
+                    ("%s:%s" % (self.username, self.password)).encode("UTF-8")).decode("ascii")
                 headers['Authorization'] = 'Basic {}'.format(valid_uname_pw)
 
         response = None
@@ -1623,7 +1623,7 @@ def slugify_zh(text, separator='_'):
 def set_resource_default_links(instance, layer, prune=False, **kwargs):
 
     from geonode.base.models import Link
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.utils.translation import ugettext
 
     # Prune old links

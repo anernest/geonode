@@ -147,10 +147,10 @@ def get_files(filename):
 
     # Verify if the filename is in ascii format.
     try:
-        filename.decode('ascii')
+        filename
     except UnicodeEncodeError:
         msg = "Please use only characters from the english alphabet for the filename. '%s' is not yet supported." \
-            % os.path.basename(filename).encode('UTF-8')
+            % os.path.basename(filename).encode('UTF-8', 'strict')
         raise GeoNodeException(msg)
 
     # Let's unzip the filname in case it is a ZIP file
@@ -1074,7 +1074,7 @@ def create_thumbnail(instance, thumbnail_remote_url, thumbnail_create_url=None,
                                 'PASSWORD' in _ogc_server_settings else 'geoserver'
                             import base64
                             valid_uname_pw = base64.b64encode(
-                                b"%s:%s" % (_user, _pwd)).decode("ascii")
+                                ("%s:%s" % (_user, _pwd)).encode("UTF-8")).decode("ascii")
                             headers['Authorization'] = 'Basic {}'.format(valid_uname_pw)
                         resp, image = ogc_client.request(thumbnail_create_url, headers=headers)
                         if 'ServiceException' in image or \

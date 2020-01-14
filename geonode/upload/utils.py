@@ -32,7 +32,7 @@ from defusedxml import lxml as dlxml
 from six import string_types, text_type
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.translation import ugettext as _

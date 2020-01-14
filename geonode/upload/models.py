@@ -22,7 +22,7 @@ import pickle
 import logging
 import shutil
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.conf import settings
 from django.utils.timezone import now
@@ -57,11 +57,11 @@ class Upload(models.Model):
     objects = UploadManager()
 
     import_id = models.BigIntegerField(null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     # hold importer state or internal state (STATE_)
     state = models.CharField(max_length=16)
     date = models.DateTimeField('date', default=now)
-    layer = models.ForeignKey(Layer, null=True)
+    layer = models.ForeignKey(Layer, null=True, on_delete=models.SET_NULL)
     upload_dir = models.CharField(max_length=100, null=True)
     name = models.CharField(max_length=64, null=True)
     complete = models.BooleanField(default=False)
@@ -131,24 +131,29 @@ class Upload(models.Model):
             if self.upload_dir and path.exists(self.upload_dir):
                 shutil.rmtree(self.upload_dir)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Upload [%s] gs%s - %s, %s' % (self.pk,
                                               self.import_id,
                                               self.name,
                                               self.user)
 
+    def __unicode__(self):
+        return u"{0}".format(self.__str__())
+
 
 class UploadFile(models.Model):
-    upload = models.ForeignKey(Upload, null=True, blank=True)
+    upload = models.ForeignKey(Upload, null=True, blank=True, on_delete=models.SET_NULL)
     file = models.FileField(upload_to="uploads")
     slug = models.SlugField(max_length=50, blank=True)
 
-    def __unicode__(self):
-        return self.slug
+    def __str__(self):
+        return "{0}".format(self.slug)
 
-    @models.permalink
+    def __unicode__(self):
+        return u"{0}".format(self.__str__())
+
     def get_absolute_url(self):
-        return ('data_upload_new', )
+        return reverse('data_upload_new', args=[self.slug, self.version_number])
 
     def save(self, *args, **kwargs):
         self.slug = self.file.name

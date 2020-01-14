@@ -24,7 +24,7 @@ from geonode.tests.base import GeoNodeBaseTestSupport
 from datetime import datetime
 from defusedxml import lxml as dlxml
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import json
 
